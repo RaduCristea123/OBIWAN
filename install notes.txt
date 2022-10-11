@@ -1,0 +1,72 @@
+Guide to run the script
+
+1. Install python 3.x (make sure to check the "Add Python to environment variables" box when installing)
+2. Run setup.bat
+3. Go to ..\obiwan-main\obiwan 
+4. Edit config.yaml.sample with notepad
+5. Change the following preset paths to the ones on your computer(!!!it must be the absolute path!!!):
+			-scc_settings_file (it should look like this: ..\obiwan-main\obiwan\scc_settings_file)
+			-scc_configuration_folder (it should look like this: ..\obiwan-main\obiwan\Samples)
+			-system_netcdf_parameters (it should look like this: ..\atmospheric_lidar\systems\"intrument"\"instrument"_netcdf_parameters)
+			-measurements_debug_dir (it should look like this: ..\debug_file ; found in the folder where the script was extracted)
+			-TimeParameter.txt file (it should look like this: ..\obiwan-main\obiwan\TimeParameter.txt) 
+6. Go to ..\obiwan-main\obiwan
+7. Edit scc_access.config.yaml
+8. Change the following:
+		 	-output_dir: (absolute path to the SCC_Output file found where the script was extracted)
+			-credentials for the SCC
+9. Edit file.bat (found in ..\netcdf)
+10. Change path after "--folder" to the path of the folder containing the measurements on your computer
+11. Change path after "--cfg" to the config.yaml.sample file found in ..\obiwan-main\obiwan
+12. Run run.bat (to start the script)
+
+==================================================================
+
+Customizable parameters
+
+max_length -> maximum allowed time length for a set of measurements (value in seconds)
+min_length -> minimum allowed time length for a set of measurements (value in seconds)
+max_gap -> maximum allowed gap between continuous measurements (value in seconds)
+
+center_type -> 3 values:
+		-1   -> default value
+		     -> does not center measurements
+		     -> separates them in sets of "max_length" seconds
+		 
+		 0   -> measurement sets will be centered at XX:00
+		     -> exceptions: first and last sets (depending on when the measuring started/stopped)
+		     
+		 1   -> measurement sets will be centered at XX:30
+		     -> exceptions: first and last sets (depending on when the measuring started/stopped)
+		     
+test_lists -> set the number of different folders you want your tests to be stored in
+	   -> after setting a number, list the names of the tests you want in each folder
+	   
+	   e.g. test_lists: 2
+	   	test_list1: test_name_1, test_name_2, test_name_3
+		test_list2: test_name_4, test_name_5
+	All the files with the chosen names will be stored in the corresponding folder
+	NOTE: The name of the file should be written at the location of the licel file header
+	
+==================================================================
+
+IMPORTANT NOTES
+
+In order for the script to recognize dark measurements, the location parameter must be "Dark"
+
+==================================================================
+
+Guide to run the script continuously
+NOTE: Follow steps 1-11 from the first guide before doing this
+
+!!!This only works for Windows!!!
+
+1. Open Task Scheduler
+2. On the right side, click on Create Task
+3. General tab: Set a name for your task
+4. Triggers tab: New -> Repeat task every: choose length based on desired max_length of the measurements sets 
+					   (e.g. max_length = 1h -> Repeat task every 1h)
+		 Other settings are optional, feel free to customize
+5.Actions tab: New -> Programs/Script: Browse -> choose path to file.bat (found in ...\netcdf\file.bat)
+	       Add arguments: "--continuous"
+	       Start in: absolute path to the folder where the script was extracted

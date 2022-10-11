@@ -1,0 +1,26 @@
+site: Munich          # e.g. Munich
+call_sign: mu         # according to EARLINET
+system_name: POLIS    # according to HOI
+channels:             # Link Licel channel name with HOI channel name
+  BT0:
+    name: 355 elastic, parallel, analog  # For file header
+    short_name: 355_epa                  # For file name
+    trigger_delay: -9                    # Positive: trigger delay, Negative: bin shift
+    background_min: 14000                # Minimum bin for background subtraction
+    background_max: 15000                # Maximum bin for background subtraction
+  BC1:
+    name: 355 elastic, parallel, photon-counting
+    short_name: 355_epp
+    trigger_delay: -9                    # Positive: trigger delay, Negative: bin shift
+    background_min: 14000                # Minimum bin for background subtraction
+    background_max: 15000                # Maximum bin for background subtraction
+    dead_time: 3.8                       # Dead time in ns
+sectors:              # Link Licel "site" value (as recorded in the file header) with telecover sector
+  N: 'NO'             # These are key: value pairs. The key is the name of the sector, the value is the "site" name in the file
+  E: EA               # 'NO' is a reserved word and evaluates to false. Thus it has to be written in quotes
+  W: WE
+  S: SO
+  N2: NO2
+  D: DARK
+sector_order: [N, E, W, S, N2, D]  # Order for recording
+bins_to_keep: 1500                 # Number of bins to keep in each profile

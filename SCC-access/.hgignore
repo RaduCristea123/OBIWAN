@@ -1,0 +1,8 @@
+syntax: glob
+*.rst~
+*.py~
+*.pyc
+re:^settings\.py$
+re:^\.idea/
+scc_access.egg-info/
+re:^\.pytest_cache/

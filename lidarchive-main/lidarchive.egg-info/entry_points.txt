@@ -1,0 +1,2 @@
+[console_scripts]
+lidarchive = lidarchive.scripts.lidarchive:main

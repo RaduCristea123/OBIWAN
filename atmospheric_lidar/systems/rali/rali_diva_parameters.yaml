@@ -1,0 +1,57 @@
+global_parameters:
+  title: L0 lidar data
+  source: RALI lidar
+  institution: INOE, Bucharest, Romania
+  references: Nemuc, A. et al, Atmos. Meas. Tech. 6, 3243–3255, 2013.
+  Conventions: CF-1.7
+  comment: Test file
+  location: Magurele, Bucharest, Romania
+  data_version: 1.0
+  history: "{date} {file} Data file created.\n"
+global_variables:
+  laser_pointing_angle: 0
+  latitude: 44.348
+  longitude: 26.029
+  system_altitude: 93.0
+channels:
+  01064.o_an:
+    long_name: total elastic signal at 1064nm
+    detector_type: APD                  # APD or PMT
+    detection_mode: analog              # analog or photon-counting
+    detector_manufacturer: Hamamatsu    # Optional, use 'unknown' for blank
+    detector_model: ABC                 # Optional
+    daq_manufacturer: Licel             # Optional
+    daq_model: unknown                  # Optional
+    bin_length: 50                      # ns
+    trigger_delay: 5000                 # ns. Time difference of channel trigger from pulse emission. Negative for pre-trigger
+    laser_repetition_rate: 10           # Hz
+    emission_wavelength: 1064.17        # nm
+    emission_polarization: linear       # linear, circular, or none
+    emission_energy: 100                # Nominal, in mJ
+    filter_cw: 1064.20                  # nm
+    filter_fwhm: 1.                     # nm
+    fov: 2.4                            # mrad full angle
+    detection_polarization: linear      # linear, circular, or none
+    polarizer_angle: 0.                 # polarization angle in case of linear polarization
+  00532.p_ph:
+    long_name: parallel elastic signal at 532nm
+    detector_type: PMT
+    detection_mode: photon-counting     # analog or photon-counting
+    detector_manufacturer: Hamamatsu    # Optional, use 'unknown' for blank
+    detector_model: ABC                 # Optional
+    daq_manufacturer: Licel             # Optional
+    daq_model: unknown                  # Optional
+    bin_length: 50                      # ns
+    trigger_delay: 5000                 # ns. Time difference of channel trigger from pulse emission. Negative for pre-trigger
+    laser_repetition_rate: 10           # Hz
+    emission_wavelength: 532.085        # nm    
+    emission_polarization: linear       # linear, circular, or none
+    emission_energy: 100                # Nominal, in mJ
+    filter_cw: 532.0                    # nm
+    filter_fwhm: 0.5                    # nm
+    fov: 2.4                            # mrad full angle
+    detection_polarization: linear      # linear, circular, or total
+    polarizer_angle: 0.                 # polarization angle in case of linear polarization
+    dead_time_model: paralyzable        # paralyzable, non-paralyzable, or other
+    dead_time: 3.8                      # ns 
+     

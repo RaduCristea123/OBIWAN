@@ -1,0 +1,8 @@
+install notes for obiwan
+1. Download the obiwan and lidar archive pakage
+2. install python 3.x
+3. run cmd as administrator
+4. go to the first pakage 
+5. run the following command in the pakage dir: "py -3 -m pip install -e ."
+6. go to the second pakage
+7. run the following command in the pakage dir: "py -3 -m pip install -e ."

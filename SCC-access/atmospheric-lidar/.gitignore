@@ -1,0 +1,12 @@
+*.pyc
+*.py~
+*.rst~
+readme.md~
+*.orig
+.idea/*
+atmospheric_lidar\.egg-info/
+*.nc
+build/*
+dist/*
+docs/_build/html/*
+docs/_build/doctrees/*

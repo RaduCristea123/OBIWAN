@@ -1,0 +1,40 @@
+1. insert a Debug mode in on Cfg file like:
+Debugging: on/off
+Debuggign_output_dir: main_dir\lidar_easurements\output
+  In debug mode the script should copy each one hour set in a different directory "YYYY-MM-DD-HH-mm" and the associated Dark files to a subdirectory "D". 
+  The created nc file should be copied in the "YYYY-MM-DD-HH-mm" directory for each measurement
+  This way the tester could check the files and conversion and could track any errors in the script and could use the script to structure the raw data in a proper and clear way 
+  for further use 
+
+      main_dir\lidar_easurements\YYYY-MM-DD-HH-00     measurements (location = "Atena")
+                                 YYYY-MM-DD-HH-00\D   dark (location = "Dark")
+                                 YYYY-MM-DD-HH-01     measurements (location = "Atena")
+                                 YYYY-MM-DD-HH-01\D   dark (location = "Dark")
+                                 ........
+
+2. set the code to be used also for different ways to store the raw files
+  A) the current one: all files in same directory. The Dark files should have "Dark" in the Location section in the header. The measurements should have the same location: e.g. for one hour 
+  measurements all file should have the same name for the location "Bucharest" or "Athens" or "Cairo"
+      main_dir\lidar_easurements
+  
+  B) Each measurement set (two or three or five hours set) is stored in a different folder ("YYYY-MM-DD-HH-mm") while the Dark files are stored in 
+  a subdirectory named "D" inside the main measurement directory
+      main_dir\lidar_easurements\YYYY-MM-DD-HH-00     measurements (location = "Atena")
+                                 YYYY-MM-DD-HH-00\D   dark (location = "Dark")
+                                 YYYY-MM-DD-HH-01     measurements (location = "Atena")
+                                 YYYY-MM-DD-HH-01\D   dark (location = "Dark")
+                                 ........
+      
+  C) Each measurement set (two or three or five hours set) is stored in a different folder ("YYYY-MM-DD-HH-mm") togather with the Dark files. The Dark files should have "Dark" in the Location section in the header. The measurements should have the same location: e.g. for one hour 
+  measurements all file should have the same name for the location "Bucharest" or "Athens" or "Cairo"
+      main_dir\lidar_easurements\YYYY-MM-DD-HH-00     measurements (location = "Atena") + dark (location = "Dark")
+                                 YYYY-MM-DD-HH-01     measurements (location = "Atena") + dark (location = "Dark")
+                                 YYYY-MM-DD-HH-02     measurements (location = "Atena") + dark (location = "Dark")
+                                 ........
+                               
+3. Create an option in the cfg file to copy or move the files in the designated one hour directories (see opint 1)
+File method (Copy or Move): Copy
+
+4. Create a log file that keeps track of the processed files (converted and submitted). Create an option in the Cfg file to overwrite the processed files or skip them
+Overright files: Yes/No
+

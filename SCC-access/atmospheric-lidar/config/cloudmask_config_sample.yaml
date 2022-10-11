@@ -1,0 +1,7 @@
+channel: "01064.o_an"         # Identified of the channel to use for cloud masking
+cloudfree_period_min: 60      # Minimum duration of cloud-free period to convert (in minutes)
+file_duration_max:  120       # Maximum duration of file to create (in minutes)
+max_cloud_height: 8000        # Maximum altitude (in m) to check for clouds.
+plot: True                    # Create plots of cloud free periods
+plot_directory: ./            # Output directory for creating plots
+
