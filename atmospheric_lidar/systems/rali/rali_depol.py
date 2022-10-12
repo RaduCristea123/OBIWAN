@@ -1,5 +1,0 @@
-from ...licel_depol import LicelCalibrationMeasurement
-import rali_depolarization_parameters_2021_2nd
-
-class RALICalibrationMeasurement(LicelCalibrationMeasurement):
-    extra_netcdf_parameters = rali_depolarization_parameters_2021_2nd

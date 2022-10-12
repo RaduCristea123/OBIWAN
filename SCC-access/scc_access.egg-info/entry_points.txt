@@ -1,3 +1,0 @@
-[console_scripts]
-scc_access = scc_access.scc_access:main
-

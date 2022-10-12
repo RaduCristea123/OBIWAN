@@ -1,0 +1,17 @@
+2022-10-12 17:32 DEBUG    scc-access   Read settings file(C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\conf\scc_access.config.yaml)
+2022-10-12 17:32 DEBUG    main         {'convert': False, 'reprocess': False, 'replace': False, 'download': True, 'folder': 'C:\\Users\\Victor\\Desktop\\Work\\obiwan\\OBIWAN\\data\\data\\SCCTest', 'last_processed_date': datetime.datetime(2017, 1, 26, 17, 30, 11), 'yaml': <obiwan.obiwan.ObiwanConfig object at 0x0A6B4F10>}
+2022-10-12 17:32 DEBUG    scc-access   Attempting to login to SCC, username livio.belegante.
+2022-10-12 17:32 DEBUG    scc-access   Accessing login page at https://scc.imaa.cnr.it/accounts/login/.
+2022-10-12 17:32 DEBUG    scc-access   Submitting credentials.
+2022-10-12 17:32 INFO     start        Run started at 2022-10-12 17:32:44
+2022-10-12 17:32 INFO     main         Configuration file = C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\conf\obiwan.config.yaml
+2022-10-12 17:32 INFO     main         Data folder = C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\data\data\SCCTest
+2022-10-12 17:32 INFO     main         Minimum start time = 2017-01-26 17:30:11
+2022-10-12 17:32 INFO     main         Maximum end time = 2017-01-26 23:59:59
+2022-10-12 17:32 INFO     main         Maximum gap between measurements (seconds) = 600
+2022-10-12 17:32 INFO     main         SCC configuration file = C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\conf\scc_access.config.yaml
+2022-10-12 17:32 DEBUG    main         Identifying measurements. This can take a few minutes...
+2022-10-12 17:32 DEBUG    main         Processed 0 files
+2022-10-12 17:32 DEBUG    main         Identified 0 different continuous measurements with a maximum acceptable gap of 600s
+2022-10-12 17:32 INFO     main         Starting processing
+2022-10-12 17:32 INFO     main         Downloading SCC products
