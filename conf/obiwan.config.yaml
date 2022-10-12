@@ -1,0 +1,23 @@
+scc_settings_file: C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\conf\scc_access.config.yaml
+scc_configurations_folder: C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\data\Samples
+
+netcdf_out_folder: C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\data\netcdf
+
+maximum_upload_retries: 3
+maximum_measurement_gap: 600
+minimum_measurement_length: 1800
+maximum_measurement_length: 3600
+measurement_center_type: -1
+
+system_netcdf_parameters: C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\conf\system\rali_netcdf_parameters 2020.py
+time_parameter_file: C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\conf\TimeParameter.txt
+
+number_of_test_lists: 1
+test_list_1:
+    - N1
+    - N2
+    - S1
+start_minute: -1
+
+measurements_debug: true
+measurements_debug_dir: C:\Users\Victor\Desktop\Work\obiwan\OBIWAN\data\measurement_debug

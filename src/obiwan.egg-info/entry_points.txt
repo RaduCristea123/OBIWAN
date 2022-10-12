@@ -1,0 +1,2 @@
+[console_scripts]
+obiwan = obiwan.obiwan:main
