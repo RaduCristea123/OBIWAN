@@ -5,13 +5,12 @@ from atmospheric_lidar.licel import LicelLidarMeasurement
 from datetime import datetime, timedelta
 import glob
 import os
+import shutil
 
 licel_file_header_format = ['Filename',
                             'StartDate StartTime EndDate EndTime Altitude Longtitude Latitude ZenithAngle',
                             # Appart from Site that is read manually
                             'LS1 Rate1 LS2 Rate2 DataSets', ]
-
-testFiles = []
 
 class Lidarchive:
     '''
@@ -69,7 +68,7 @@ class Lidarchive:
             for channel_name, channel in licel_measurement.channels.items():
                 self.channels.append(Lidarchive.MeasurementChannel(channel))
 
-        def IsDark(self):
+        def IsDark(self, dark_location = "Dark"):
             '''
             Checks if a given measurement represents a dark measurement.
 
@@ -77,13 +76,16 @@ class Lidarchive:
             ------------
             True if the measurement is a dark measurement, False otherwise.
             '''
-            if self.site == 'Dark':
+            if self.site == dark_location:
                 return True
 
             return False
 
         def Path(self):
             return self.path
+            
+        def Filename(self):
+            return os.path.basename(self.path)
 
         def StartDateTime(self):
             return self.start_datetime
@@ -144,8 +146,16 @@ class Lidarchive:
 
         def NumberAsString(self):
             return "%04d" % (self.number)
+            
+        def Id(self):
+            try:
+                date = self.DataFiles()[0].StartDateTime().strftime("%Y%m%d")
+                
+                return f"{date}_{self.NumberAsString()}"
+            except:
+                return "UNKNOWN_MEASUREMENT"
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         '''
         Constructs a Lidarchive object.
         '''
@@ -156,6 +166,9 @@ class Lidarchive:
         self.accepted_max_length = 0
         self.accepted_center_type = -1
         self.continuousMeasurements = []
+        self.tests = kwargs.get("tests", {})
+        self.dark_location = kwargs.get("dark_location", "Dark")
+        self.measurement_location = kwargs.get("measurement_location", "N/A")
 
     def SetFolder(self, folder):
         '''
@@ -197,7 +210,7 @@ class Lidarchive:
 
         index = 0
         for measurement in self.measurements:
-            if measurement.IsDark():
+            if measurement.IsDark( self.dark_location ):
                 index += 1
         #ignore dark files
 
@@ -267,7 +280,7 @@ class Lidarchive:
         return distinct_sets
 
 
-    def FilterByTime(self, measurements, min_length, max_length, center_type, time_parameter_file):
+    def FilterByTime(self, measurements, min_length, max_length, center_type):
         '''
         Retrieve sets of measurements split into groups based on minimum and maximum allowed
         length of the set.
@@ -290,18 +303,17 @@ class Lidarchive:
         '''
 
         remaining_hours = int(max_length / 3600)
+        
+        '''
         with open(os.path.abspath(time_parameter_file), "r") as f:
             last_end = f.readlines()[1][:-1]
         if measurements:
             was_sent = self.MeasurementWasSent(last_end, min_length, max_length)[0]
         if not was_sent:
             return []
+        '''
 
         if len(measurements) < 1:
-            return []
-
-        if len(measurements) == 1:
-            testFiles.append(measurements[0])
             return []
 
         segments = []
@@ -412,6 +424,72 @@ class Lidarchive:
             segment.append(measurements[index])
 
         return segments
+        
+    def CopyTestFiles ( self, out_folder, date_format = "%Y-%m-%d-%H-%M", strict = True ):
+        '''
+        Copies test files to the specified folder. It will split them into subfolders based on test date.
+
+        Parameters
+        ----------
+        out_folder : string
+            Path to the folder where we want to copy the files. If it does not exist, it will be created.
+        date_format : string
+            Date format used to create subfolders for each of the tests.
+        strict : Boolean
+            If using strict mode, all test files must be present or else the test will be ignored.
+
+        Returned values
+        ---------------
+        True if the function succeeded, False otherwise.
+        '''
+        if len ( self.measurements ) < 1:
+            return False
+            
+        potential_tests = dict([ (test_name, []) for test_name in self.tests.keys() ])
+        valid_tests = []
+            
+        # Run through all measurements to see if any test was done:
+        for measurement in self.measurements:
+            for test_name, test_types in self.tests.items():
+                if measurement.Site() in test_types:
+                    # Measurement could be part of this test:
+                    potential_tests[ test_name ].append (measurement)
+                else:
+                    # This measurement is not part of the test, so let's see
+                    # if the test has completed until now:
+                    test_files = potential_tests.get( test_name, [] )
+                    potential_tests[ test_name ] = []
+                    
+                    if Lidarchive.CheckTest ( test_types, test_files, strict ):
+                        subfolder_name = test_files[0].StartDateTime().strftime(date_format)
+                        test_subfolder = os.path.join ( out_folder, test_name, subfolder_name )
+                        
+                        if not os.path.isdir ( test_subfolder ):
+                            os.makedirs ( test_subfolder )
+                        
+                        for file in test_files:
+                            shutil.copy2(file.Path(), test_subfolder)
+            
+    @staticmethod
+    def CheckTest ( test_types, files, strict = True ):
+        # No need to check any further:
+        if len(test_files) < len(test_types) and strict:
+            return False
+            
+        # If we're running in non-strict mode we basically want
+        # at least one file. If we get that, test is considered valid.
+        if len(test_files) > 0 and not strict:
+            return True
+            
+        # Check all required types of files are present:
+        test_valid = True
+        for test_type in test_types:
+            if test_type not in [ file.Site() for file in test_files ]:
+                # Test type was not found. Can stop looking.
+                test_valid = False
+                break
+                
+        return test_valid
 
     def FindDarkFiles(self, measurement_date):
 
@@ -471,7 +549,7 @@ class Lidarchive:
                             type=''
                         )
 
-                        if measurement.IsDark():
+                        if measurement.IsDark( self.dark_location ):
                             dark_measurements.append(measurement)
                     except Exception as e:
                         pass
@@ -506,8 +584,6 @@ class Lidarchive:
 
         if len(matching_dark_measurements) == 1:
             return matching_dark_measurements
-
-
 
         dark_segments = self.FilterByGap(matching_dark_measurements, max_gap, same_location=True)
 
@@ -562,7 +638,7 @@ class Lidarchive:
             merged[dark_file].append(segment)
         return merged
 
-    def ContinuousMeasurements(self, time_parameter_file, max_gap=300, min_length = 1800, max_length=3600, center_type = 0):
+    def ContinuousMeasurements(self, max_gap=300, min_length = 1800, max_length=3600, center_type = 0):
         '''
         Retrieve the continuous measurement sets with a chosen maximum acceptable time gap
         between consecutive measurements.
@@ -579,23 +655,76 @@ class Lidarchive:
         describing each measurement in the set.
         '''
         if len(self.continuousMeasurements) == 0:
-            self.ComputeContinuousMeasurements(time_parameter_file, max_gap, min_length, max_length, center_type)
+            self.ComputeContinuousMeasurements(max_gap, min_length, max_length, center_type)
 
         if self.accepted_gap != max_gap:
-            self.ComputeContinuousMeasurements(time_parameter_file, max_gap, min_length, max_length, center_type)
+            self.ComputeContinuousMeasurements(max_gap, min_length, max_length, center_type)
 
         if self.accepted_min_length != min_length:
-            self.ComputeContinuousMeasurements(time_parameter_file, max_gap, min_length, max_length, center_type)
+            self.ComputeContinuousMeasurements(max_gap, min_length, max_length, center_type)
 
         if self.accepted_max_length != max_length:
-            self.ComputeContinuousMeasurements(time_parameter_file, max_gap, min_length, max_length, center_type)
+            self.ComputeContinuousMeasurements(max_gap, min_length, max_length, center_type)
 
         if self.accepted_center_type != center_type:
-            self.ComputeContinuousMeasurements(time_parameter_file, max_gap, min_length, max_length, center_type)
+            self.ComputeContinuousMeasurements(max_gap, min_length, max_length, center_type)
 
         return self.continuousMeasurements
+        
+    def ContinuousDarkMeasurements(self, max_gap):
+        dark_measurements = [ m for m in self.measurements if m.IsDark ( self.dark_location ) ]
+        
+        dark_segments = self.FilterByGap ( dark_measurements, max_gap, same_location = False )
+        
+        return dark_segments
+        
+    def ContinuousDataMeasurements(self, max_gap):
+        data_measurements = [ m for m in self.measurements if not m.IsDark ( self.dark_location ) and m.Site() == self.measurement_location ]
+        
+        data_segments = self.FilterByGap ( data_measurements, max_gap, same_location = False )
+        
+        return data_segments
+        
+    @staticmethod
+    def ClosestDarkSegment ( data_segment, dark_segments ):
+        data_start = data_segment[0].StartDateTime()
+        data_end = data_segment[0].EndDateTime()
+        
+        closest = None
+        best_dark_segment = None
+        
+        for index, dark_segment in enumerate(dark_segments):
+            dark_start = data_segment[0].StartDateTime()
+            dark_end = data_end = data_segment[0].EndDateTime()
+            
+            if dark_end < data_start:
+                # Dark measurements were taken before data measurements.
+                time_gap = data_start - dark_end
+            elif dark_start > data_end:
+                # Dark measurements were taken after data measurements.
+                time_gap = dark_start - data_end
+            else:
+                # Dark measurements and data measurements overlap so set
+                # the time gap to zero.
+                #
+                # We can also safely assume no other dark segment will come
+                # close to this performance. :P
+                time_gap = timedelta(seconds=0)
+                return dark_segment
+                
+            if closest is None:
+                closest = time_gap
+                best_dark_segment = index
+            elif time_gap < closest:
+                closest = time_gap
+                best_dark_segment = index
+                
+        if best_dark_segment is None:
+            return []
+            
+        return dark_segments[index]
 
-    def ComputeContinuousMeasurements(self, time_parameter_file, max_gap, min_length, max_length, center_type):
+    def ComputeContinuousMeasurements(self, max_gap, min_length, max_length, center_type):
         '''
         Find all continuous measurement sets in the files identified after calling
         ReadFolder ().
@@ -621,36 +750,26 @@ class Lidarchive:
             self.accepted_max_length = max_length
             self.accepted_center_type = center_type
             return
-
-        gapped_measurements = self.FilterByGap(self.measurements, max_gap, same_location=True)
+            
+        gapped_dark_segments = self.ContinuousDarkMeasurements ( max_gap )
+        gapped_data_segments = self.ContinuousDataMeasurements ( max_gap )
 
         measurement_number = 0
         last_start = None
 
-        for continuous in gapped_measurements:
-            # segments = self.FilterByLength ( continuous, max_length, min_length )
-
-            #checking if all files are dark in gapped_measurements
-            all_dark = True
-            for measurement in continuous:
-                if not measurement.IsDark():
-                    all_dark = False
-            if all_dark == True:
-                continue
+        for continuous in gapped_data_segments:
             # First file in continuous should be a dark file:
             #segments = self.FilterByLength(continuous, max_length, min_length)
             if center_type != -1:
-                segments = self.FilterByTime(continuous, min_length, max_length, center_type, time_parameter_file)
+                segments = self.FilterByTime(continuous, min_length, max_length, center_type) #, time_parameter_file)
             else:
                 segments = self.FilterByLength(continuous, max_length, min_length)
+                
             for segment in segments:
-                dark_measurements = self.IdentifyDarkFile(segment, max_gap)
-                # real_measurements = [x for x in segment if x.IsDark() == False]
-
-                # First file in continuous is a dark file:
-                # The rest of the files are data files:
+                # This is already filtered
                 real_measurements = segment
-
+                # Need to find closest continuous dark segment:
+                dark_measurements = Lidarchive.ClosestDarkSegment(data_segment = segment, dark_segments = gapped_dark_segments)
 
                 # Apply measurement number if necessary:
                 if last_start != None:
@@ -663,6 +782,7 @@ class Lidarchive:
 
                 last_start = segment[0].StartDateTime()
 
+                # Do not add last segment if new data files might appear just in case it's a recent dataset:
                 if (datetime.now() - segment[-1].EndDateTime()).total_seconds() >= max_gap:
                     self.continuousMeasurements.append(Lidarchive.Measurement(
                         dark=dark_measurements,
@@ -674,9 +794,6 @@ class Lidarchive:
         self.accepted_min_length = min_length
         self.accepted_max_length = max_length
         self.accepted_center_type = center_type
-
-    def TestFiles(self):
-        return testFiles
 
     def Measurements(self):
         '''
@@ -826,7 +943,7 @@ class Lidarchive:
                 if good_file == True:
                     try:
                         info = self.ReadInfoFromHeader(path)
-
+                        
                         self.measurements.append(Lidarchive.MeasurementFile(
                             path=path,
                             start_datetime=info['StartDateTime'],
@@ -837,6 +954,15 @@ class Lidarchive:
                     except Exception as e:
                         print(str(e))
                         pass
+                    
+        # Make sure we get a unique list of files!
+        # Since we're walking down the folder tree, it might just so happen
+        # that some files can be stored multiple times in different folders.
+        #
+        # When that happens, atmospheric-lidar is confused and throws errors,
+        # so it's better to take care of it here.
+        seen = set()
+        self.measurements = [ m for m in self.measurements if m.Filename() not in seen and not seen.add(m.Filename()) ]
 
         self.measurements.sort(key=lambda x: x.StartDateTime())
 

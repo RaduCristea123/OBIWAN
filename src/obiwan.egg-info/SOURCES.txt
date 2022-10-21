@@ -1,9 +1,0 @@
-setup.py
-obiwan/__init__.py
-obiwan/obiwan.py
-obiwan.egg-info/PKG-INFO
-obiwan.egg-info/SOURCES.txt
-obiwan.egg-info/dependency_links.txt
-obiwan.egg-info/entry_points.txt
-obiwan.egg-info/requires.txt
-obiwan.egg-info/top_level.txt

@@ -1,0 +1,31 @@
+# Configuration files
+conf/scc_access.config.yaml
+conf/obiwan.config.yaml
+conf/TimeParameter.txt
+
+# datalog.csv
+*.csv
+
+# Data files
+RM*
+*.nc
+
+scc_output/
+
+# Various Python files:
+__pycache__/
+*.py[cod]
+
+bin/
+build/
+develop-eggs/
+dist/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
