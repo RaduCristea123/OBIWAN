@@ -9,6 +9,8 @@ conf/TimeParameter.txt
 # Data files
 RM*
 *.nc
+*.log
+*.swp
 
 scc_output/
 
